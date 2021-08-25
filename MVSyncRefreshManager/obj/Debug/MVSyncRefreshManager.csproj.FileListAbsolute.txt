@@ -1,0 +1,17 @@
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\obj\Debug\MVSyncRefreshManager.MainForm.resources
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\obj\Debug\MVSyncRefreshManager.Properties.Resources.resources
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\obj\Debug\MVSyncRefreshManager.csproj.GenerateResource.cache
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\obj\Debug\MVSyncRefreshManager.csproj.CoreCompileInputs.cache
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\MVSyncRefreshManager.exe.config
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\MVSyncRefreshManager.exe
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\MVSyncRefreshManager.pdb
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\UODOTNET.dll
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\obj\Debug\MVSyncRefreshManager.csproj.CopyComplete
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\obj\Debug\MVSyncRefreshManager.exe
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\obj\Debug\MVSyncRefreshManager.pdb
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\obj\Debug\MVSyncRefreshManager.csproj.AssemblyReference.cache
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\Newtonsoft.Json.dll
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\Newtonsoft.Json.xml
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\Renci.SshNet.dll
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\Renci.SshNet.xml
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\obj\Debug\MVSyncRefreshManager.Resources.resources
