@@ -31,6 +31,8 @@ namespace MVSyncRefreshManager
         {
             this.dumpButton = new System.Windows.Forms.Button();
             this.fetchFilesButton = new System.Windows.Forms.Button();
+            this.bulkInsertButton = new System.Windows.Forms.Button();
+            this.eventLog = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // dumpButton
@@ -54,11 +56,33 @@ namespace MVSyncRefreshManager
             this.fetchFilesButton.UseVisualStyleBackColor = true;
             this.fetchFilesButton.Click += new System.EventHandler(this.fetchFilesButton_Click);
             // 
+            // bulkInsertButton
+            // 
+            this.bulkInsertButton.Enabled = false;
+            this.bulkInsertButton.Location = new System.Drawing.Point(13, 71);
+            this.bulkInsertButton.Name = "bulkInsertButton";
+            this.bulkInsertButton.Size = new System.Drawing.Size(281, 23);
+            this.bulkInsertButton.TabIndex = 2;
+            this.bulkInsertButton.Text = "Run Bulk Insert";
+            this.bulkInsertButton.UseVisualStyleBackColor = true;
+            this.bulkInsertButton.Click += new System.EventHandler(this.bulkInsertButton_Click);
+            // 
+            // eventLog
+            // 
+            this.eventLog.Location = new System.Drawing.Point(12, 100);
+            this.eventLog.Name = "eventLog";
+            this.eventLog.ReadOnly = true;
+            this.eventLog.Size = new System.Drawing.Size(282, 338);
+            this.eventLog.TabIndex = 3;
+            this.eventLog.Text = "";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(306, 450);
+            this.Controls.Add(this.eventLog);
+            this.Controls.Add(this.bulkInsertButton);
             this.Controls.Add(this.fetchFilesButton);
             this.Controls.Add(this.dumpButton);
             this.Name = "MainForm";
@@ -71,5 +95,7 @@ namespace MVSyncRefreshManager
 
         private System.Windows.Forms.Button dumpButton;
         private System.Windows.Forms.Button fetchFilesButton;
+        private System.Windows.Forms.Button bulkInsertButton;
+        private System.Windows.Forms.RichTextBox eventLog;
     }
 }

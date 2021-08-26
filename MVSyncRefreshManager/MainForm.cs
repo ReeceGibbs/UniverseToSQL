@@ -12,6 +12,8 @@ using IBMU2.UODOTNET;
 using MVSyncRefreshManager.Models;
 using Newtonsoft.Json;
 using Renci.SshNet;
+using AutozoneSyncDataAccess;
+using System.Diagnostics;
 
 namespace MVSyncRefreshManager
 {
@@ -23,13 +25,15 @@ namespace MVSyncRefreshManager
 
         private Dictionary<string, int> dumpLog = new Dictionary<string, int>();
 
+        private HashSet<string> tableNames = new HashSet<string>();
+
         public MainForm()
         {
             InitializeComponent();
         }
 
         //code to handle our dumpButton click event
-        private void dumpButton_Click(object sender, EventArgs e)
+        private async void dumpButton_Click(object sender, EventArgs e)
         {
 
             //we want to establish a connection with the UniVerse box through UniObjects
@@ -49,8 +53,13 @@ namespace MVSyncRefreshManager
 
                 _universeSession.Timeout = 360000;
 
+                eventLog.AppendText("File Dump Started\n\n");
+
                 //call our method to dump the remote uv files
-                DumpRemoteFiles();
+                int elapsedTime = DumpRemoteFiles();
+
+                eventLog.AppendText("Files Dumped Successfully\n" +
+                    $"Elapsed time: {elapsedTime}\n\n");
             }
             catch (Exception exception)
             {
@@ -89,7 +98,7 @@ namespace MVSyncRefreshManager
                     {
 
                         //check to see if the connection has been made and if so, we fetch the remote files that have been dumped
-                        using (Stream fileStream = File.Create($@"{Resources.LocalTransferPath}{item.Key}"))
+                        using (Stream fileStream = File.Create($@"{Resources.LocalTransferPath}{item.Key}.DAT"))
                         {
 
                             //pulling the file from linux and popping it in the correct dest file
@@ -104,40 +113,66 @@ namespace MVSyncRefreshManager
                     }
                 }
             }
+
+            //enabling the bulk insert button
+            bulkInsertButton.Enabled = true;
         }
 
         //method to read from the refresh config file and run dump the necessary files on the universe system
-        private void DumpRemoteFiles()
+        private int DumpRemoteFiles()
         {
 
-            //in the future we will get the config path from the form
-            string refreshConfigPath = Resources.RefreshConfigPath;
+            Stopwatch stopwatch = new Stopwatch();
 
-            //reading in the config file
-            string serializedConfig = File.ReadAllText(refreshConfigPath);
+            stopwatch.Start();
 
-            //we deserialize our config file to our refresh details objects and sub-objects
-            RefreshDetails refreshDetails = JsonConvert.DeserializeObject<RefreshDetails>(serializedConfig);
-
-            //we iterate through each one of our branchdetails objects
-            foreach (BranchDetailItem branchDetailItem in refreshDetails.BranchDetails)
+            try
             {
 
-                foreach (string file in branchDetailItem.Files)
+                //in the future we will get the config path from the form
+                string refreshConfigPath = Resources.RefreshConfigPath;
+
+                //reading in the config file
+                string serializedConfig = File.ReadAllText(refreshConfigPath);
+
+                //we deserialize our config file to our refresh details objects and sub-objects
+                RefreshDetails refreshDetails = JsonConvert.DeserializeObject<RefreshDetails>(serializedConfig);
+
+                //we iterate through each one of our branchdetails objects
+                foreach (BranchDetailItem branchDetailItem in refreshDetails.BranchDetails)
                 {
 
-                    //setting up our remote subroutine call
-                    UniSubroutine mvSyncDumpSubroutine = _universeSession.CreateUniSubroutine("MvSyncDump", 3);
+                    foreach (string file in branchDetailItem.Files)
+                    {
 
-                    mvSyncDumpSubroutine.SetArg(0, branchDetailItem.BranchName);
-                    mvSyncDumpSubroutine.SetArg(1, file);
-                    mvSyncDumpSubroutine.SetArg(2, "0");
+                        eventLog.AppendText($"Dumping {file}\n");
 
-                    mvSyncDumpSubroutine.Call();
+                        //setting up our remote subroutine call
+                        UniSubroutine mvSyncDumpSubroutine = _universeSession.CreateUniSubroutine("MvSyncDump", 3);
 
-                    dumpLog.Add(file, Convert.ToInt32(mvSyncDumpSubroutine.GetArg(2)));
+                        mvSyncDumpSubroutine.SetArg(0, branchDetailItem.BranchName);
+                        mvSyncDumpSubroutine.SetArg(1, file);
+                        mvSyncDumpSubroutine.SetArg(2, "0");
+
+                        mvSyncDumpSubroutine.Call();
+
+                        dumpLog.Add(file, Convert.ToInt32(mvSyncDumpSubroutine.GetArg(2)));
+
+                        tableNames.Add(file.Substring(3).Replace('.', '_'));
+
+                        eventLog.AppendText("Dump Successful\n");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+
+                eventLog.AppendText($"{ex}\n");
+            }
+
+            stopwatch.Stop();
+
+            return (int)stopwatch.ElapsedMilliseconds;
         }
 
         //when this button is clicked, the files that have been dumped will be fetched from the linux box
@@ -151,6 +186,39 @@ namespace MVSyncRefreshManager
                 FetchRemoteFiles();
             }
             catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        //button to perform the third and final portion of the refresh
+        private void bulkInsertButton_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+
+                //invoking our entity model reference
+                using (Entities entities = new Entities())
+                {
+
+                    //clearing the files before inserting the new data
+                    foreach (var table in tableNames)
+                    {
+
+                        entities.Database.ExecuteSqlCommand($"truncate table [{table}]");
+                    }
+
+                    //inserting the refresh data into the database
+                    foreach (var item in dumpLog)
+                    {
+
+                        entities.Database.ExecuteSqlCommand($"BulkInsert '{item.Key.Substring(3).Replace('.', '_')}', '{Resources.LocalTransferPath + item.Key}.DAT', '{item.Value}'");
+                    }
+                }
+            }
+            catch (Exception ex)
             {
 
                 throw;

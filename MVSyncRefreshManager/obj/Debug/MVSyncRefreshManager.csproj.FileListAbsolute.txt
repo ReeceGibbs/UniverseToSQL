@@ -15,3 +15,10 @@ C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\Newt
 C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\Renci.SshNet.dll
 C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\Renci.SshNet.xml
 C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\obj\Debug\MVSyncRefreshManager.Resources.resources
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\AutozoneSyncDataAccess.dll
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\EntityFramework.dll
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\EntityFramework.SqlServer.dll
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\AutozoneSyncDataAccess.pdb
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\AutozoneSyncDataAccess.dll.config
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\EntityFramework.xml
+C:\Source Repo\Projects\MVSyncRefreshManager\MVSyncRefreshManager\bin\Debug\EntityFramework.SqlServer.xml

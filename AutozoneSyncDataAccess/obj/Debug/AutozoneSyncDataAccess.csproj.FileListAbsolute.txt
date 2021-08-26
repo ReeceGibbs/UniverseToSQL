@@ -1,0 +1,12 @@
+C:\Source Repo\Projects\MVSyncRefreshManager\AutozoneSyncDataAccess\bin\Debug\AutozoneSyncDataAccess.dll.config
+C:\Source Repo\Projects\MVSyncRefreshManager\AutozoneSyncDataAccess\bin\Debug\AutozoneSyncDataAccess.dll
+C:\Source Repo\Projects\MVSyncRefreshManager\AutozoneSyncDataAccess\bin\Debug\AutozoneSyncDataAccess.pdb
+C:\Source Repo\Projects\MVSyncRefreshManager\AutozoneSyncDataAccess\bin\Debug\EntityFramework.dll
+C:\Source Repo\Projects\MVSyncRefreshManager\AutozoneSyncDataAccess\bin\Debug\EntityFramework.SqlServer.dll
+C:\Source Repo\Projects\MVSyncRefreshManager\AutozoneSyncDataAccess\bin\Debug\EntityFramework.xml
+C:\Source Repo\Projects\MVSyncRefreshManager\AutozoneSyncDataAccess\bin\Debug\EntityFramework.SqlServer.xml
+C:\Source Repo\Projects\MVSyncRefreshManager\AutozoneSyncDataAccess\obj\Debug\AutozoneSyncDataAccess.csproj.AssemblyReference.cache
+C:\Source Repo\Projects\MVSyncRefreshManager\AutozoneSyncDataAccess\obj\Debug\AutozoneSyncDataAccess.csproj.CoreCompileInputs.cache
+C:\Source Repo\Projects\MVSyncRefreshManager\AutozoneSyncDataAccess\obj\Debug\AutozoneSyncDataAccess.csproj.CopyComplete
+C:\Source Repo\Projects\MVSyncRefreshManager\AutozoneSyncDataAccess\obj\Debug\AutozoneSyncDataAccess.dll
+C:\Source Repo\Projects\MVSyncRefreshManager\AutozoneSyncDataAccess\obj\Debug\AutozoneSyncDataAccess.pdb
