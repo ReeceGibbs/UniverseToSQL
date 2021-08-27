@@ -1,0 +1,10 @@
+{
+  "HostName": "autozonedev",
+  "UniRpcPort": 31000,
+  "SshPort": 22,
+  "Username": "grant",
+  "Password": "2P2tpdu",
+  "SourceAccount": "MVSYNC",
+  "SourcePath": "/u1/universe/MVSYNC/MVON.TRAN000/",
+  "DestinationPath": "C:\\RefreshTarget\\"
+}

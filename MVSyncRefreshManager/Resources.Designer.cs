@@ -61,7 +61,7 @@ namespace MVSyncRefreshManager {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to C:\Users\reece\Desktop\AutoZone Refresh Change\ConnectionConfig.json.
+        ///   Looks up a localized string similar to .\Config\ConnectionConfig.json.
         /// </summary>
         internal static string ConnectionConfigPath {
             get {
@@ -70,38 +70,11 @@ namespace MVSyncRefreshManager {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to C:\Users\reece\Desktop\AutoZone Refresh Change\FileFetchConfig.json.
-        /// </summary>
-        internal static string FileFetchConfigPath {
-            get {
-                return ResourceManager.GetString("FileFetchConfigPath", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to C:\RefreshTarget\.
-        /// </summary>
-        internal static string LocalTransferPath {
-            get {
-                return ResourceManager.GetString("LocalTransferPath", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to C:\Users\reece\Desktop\AutoZone Refresh Change\RefreshConfig.json.
+        ///   Looks up a localized string similar to .\Config\RefreshConfig.json.
         /// </summary>
         internal static string RefreshConfigPath {
             get {
                 return ResourceManager.GetString("RefreshConfigPath", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to /u1/universe/MVSYNC/MVON.TRAN000/.
-        /// </summary>
-        internal static string RemoteDumpPath {
-            get {
-                return ResourceManager.GetString("RemoteDumpPath", resourceCulture);
             }
         }
     }

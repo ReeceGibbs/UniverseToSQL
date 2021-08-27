@@ -37,9 +37,9 @@ namespace MVSyncRefreshManager
             // 
             // dumpButton
             // 
-            this.dumpButton.Location = new System.Drawing.Point(13, 13);
+            this.dumpButton.Location = new System.Drawing.Point(12, 12);
             this.dumpButton.Name = "dumpButton";
-            this.dumpButton.Size = new System.Drawing.Size(281, 23);
+            this.dumpButton.Size = new System.Drawing.Size(282, 23);
             this.dumpButton.TabIndex = 0;
             this.dumpButton.Text = "Begin Data Dump";
             this.dumpButton.UseVisualStyleBackColor = true;
@@ -48,9 +48,9 @@ namespace MVSyncRefreshManager
             // fetchFilesButton
             // 
             this.fetchFilesButton.Enabled = false;
-            this.fetchFilesButton.Location = new System.Drawing.Point(13, 42);
+            this.fetchFilesButton.Location = new System.Drawing.Point(12, 41);
             this.fetchFilesButton.Name = "fetchFilesButton";
-            this.fetchFilesButton.Size = new System.Drawing.Size(281, 23);
+            this.fetchFilesButton.Size = new System.Drawing.Size(282, 23);
             this.fetchFilesButton.TabIndex = 1;
             this.fetchFilesButton.Text = "Fetch Remote Files";
             this.fetchFilesButton.UseVisualStyleBackColor = true;
@@ -59,9 +59,9 @@ namespace MVSyncRefreshManager
             // bulkInsertButton
             // 
             this.bulkInsertButton.Enabled = false;
-            this.bulkInsertButton.Location = new System.Drawing.Point(13, 71);
+            this.bulkInsertButton.Location = new System.Drawing.Point(12, 70);
             this.bulkInsertButton.Name = "bulkInsertButton";
-            this.bulkInsertButton.Size = new System.Drawing.Size(281, 23);
+            this.bulkInsertButton.Size = new System.Drawing.Size(282, 23);
             this.bulkInsertButton.TabIndex = 2;
             this.bulkInsertButton.Text = "Run Bulk Insert";
             this.bulkInsertButton.UseVisualStyleBackColor = true;
@@ -69,10 +69,10 @@ namespace MVSyncRefreshManager
             // 
             // eventLog
             // 
-            this.eventLog.Location = new System.Drawing.Point(12, 100);
+            this.eventLog.Location = new System.Drawing.Point(12, 99);
             this.eventLog.Name = "eventLog";
             this.eventLog.ReadOnly = true;
-            this.eventLog.Size = new System.Drawing.Size(282, 338);
+            this.eventLog.Size = new System.Drawing.Size(282, 339);
             this.eventLog.TabIndex = 3;
             this.eventLog.Text = "";
             // 

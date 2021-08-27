@@ -23,6 +23,10 @@ namespace MVSyncRefreshManager
         //class wide universe session variable
         private UniSession _universeSession = null;
 
+        private ConnectionDetails connectionDetails = new ConnectionDetails();
+
+        private RefreshDetails refreshDetails = new RefreshDetails();
+
         private Dictionary<string, int> dumpLog = new Dictionary<string, int>();
 
         private HashSet<string> tableNames = new HashSet<string>();
@@ -42,24 +46,21 @@ namespace MVSyncRefreshManager
 
                 //fetch the connection details from the config file
                 string connectionConfigPath = Resources.ConnectionConfigPath;
+                string refreshConfigPath = Resources.RefreshConfigPath;
 
-                string serializedConfig = File.ReadAllText(connectionConfigPath);
+                string serializedConnectionConfig = File.ReadAllText(connectionConfigPath);
+                string serializedRefreshConfig = File.ReadAllText(refreshConfigPath);
 
-                //deserialize the connectionConfig
-                ConnectionDetails connectionDetails = JsonConvert.DeserializeObject<ConnectionDetails>(serializedConfig);
+                connectionDetails = JsonConvert.DeserializeObject<ConnectionDetails>(serializedConnectionConfig);
+                refreshDetails = JsonConvert.DeserializeObject<RefreshDetails>(serializedRefreshConfig);
 
                 //connection info
-                _universeSession = UniObjects.OpenSession(connectionDetails.HostName,connectionDetails.Port, connectionDetails.Username, connectionDetails.Password, connectionDetails.SourceAccount, "uvcs");
+                _universeSession = UniObjects.OpenSession(connectionDetails.HostName,connectionDetails.UniRpcPort, connectionDetails.Username, connectionDetails.Password, connectionDetails.SourceAccount, "uvcs");
 
                 _universeSession.Timeout = 360000;
 
-                eventLog.AppendText("File Dump Started\n\n");
-
                 //call our method to dump the remote uv files
-                int elapsedTime = DumpRemoteFiles();
-
-                eventLog.AppendText("Files Dumped Successfully\n" +
-                    $"Elapsed time: {elapsedTime}\n\n");
+                await DumpRemoteFiles();
             }
             catch (Exception exception)
             {
@@ -71,55 +72,50 @@ namespace MVSyncRefreshManager
             fetchFilesButton.Enabled = true;
         }
 
-        //method to transfer the dumped uv files from linux to the sql box
-        private void FetchRemoteFiles()
+        //when this button is clicked, the files that have been dumped will be fetched from the linux box
+        private async void fetchFilesButton_Click(object sender, EventArgs e)
         {
 
-            //fetch the connection details from the config file
-            string connectionConfigPath = Resources.FileFetchConfigPath;
-
-            string serializedConfig = File.ReadAllText(connectionConfigPath);
-
-            //deserialize the connectionConfig
-            FileFetchDetails fileFetchDetailsDetails = JsonConvert.DeserializeObject<FileFetchDetails>(serializedConfig);
-
-            //define our sftp connection with our remote linux box
-            using (var sftpClient = new SftpClient(fileFetchDetailsDetails.HostName, fileFetchDetailsDetails.Port, fileFetchDetailsDetails.Username, fileFetchDetailsDetails.Password))
+            //we try and fetch the remote files from the linux box through the ssh protocol
+            try
             {
 
-                //establish the connection
-                sftpClient.Connect();
+                await FetchRemoteFiles();
+            }
+            catch (Exception exception)
+            {
 
-                //we iterate through each one of the files in the dumpLog
-                foreach (var item in dumpLog)
-                {
-
-                    try
-                    {
-
-                        //check to see if the connection has been made and if so, we fetch the remote files that have been dumped
-                        using (Stream fileStream = File.Create($@"{Resources.LocalTransferPath}{item.Key}.DAT"))
-                        {
-
-                            //pulling the file from linux and popping it in the correct dest file
-                            sftpClient.DownloadFile($"{Resources.RemoteDumpPath}{item.Key}.DAT", fileStream);
-                        }
-                    }
-                    catch (Exception)
-                    {
-
-                        //we just carry on if we can't transfer a particular file
-                        continue;
-                    }
-                }
+                eventLog.AppendText(exception.Message);
             }
 
             //enabling the bulk insert button
             bulkInsertButton.Enabled = true;
         }
 
+        //button to perform the third and final portion of the refresh
+        private async void bulkInsertButton_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+
+                await RunBulkInsert();
+            }
+            catch (Exception exception)
+            {
+
+                eventLog.AppendText(exception.Message);
+            }
+
+            dumpButton.BackColor = Color.Green;
+            fetchFilesButton.BackColor = Color.Green;
+            bulkInsertButton.BackColor = Color.Green;
+
+            eventLog.AppendText("Refresh completed successfully.");
+        }
+
         //method to read from the refresh config file and run dump the necessary files on the universe system
-        private int DumpRemoteFiles()
+        private async Task<bool> DumpRemoteFiles()
         {
 
             Stopwatch stopwatch = new Stopwatch();
@@ -129,15 +125,6 @@ namespace MVSyncRefreshManager
             try
             {
 
-                //in the future we will get the config path from the form
-                string refreshConfigPath = Resources.RefreshConfigPath;
-
-                //reading in the config file
-                string serializedConfig = File.ReadAllText(refreshConfigPath);
-
-                //we deserialize our config file to our refresh details objects and sub-objects
-                RefreshDetails refreshDetails = JsonConvert.DeserializeObject<RefreshDetails>(serializedConfig);
-
                 //we iterate through each one of our branchdetails objects
                 foreach (BranchDetailItem branchDetailItem in refreshDetails.BranchDetails)
                 {
@@ -145,60 +132,129 @@ namespace MVSyncRefreshManager
                     foreach (string file in branchDetailItem.Files)
                     {
 
-                        eventLog.AppendText($"Dumping {file}\n");
+                        eventLog.AppendText($"Dumping file: {file}\n");
 
-                        //setting up our remote subroutine call
-                        UniSubroutine mvSyncDumpSubroutine = _universeSession.CreateUniSubroutine("MvSyncDump", 3);
+                        await Task.Run(() =>
+                        {
 
-                        mvSyncDumpSubroutine.SetArg(0, branchDetailItem.BranchName);
-                        mvSyncDumpSubroutine.SetArg(1, file);
-                        mvSyncDumpSubroutine.SetArg(2, "0");
+                            //setting up our remote subroutine call
+                            UniSubroutine mvSyncDumpSubroutine = _universeSession.CreateUniSubroutine("MvSyncDump", 3);
 
-                        mvSyncDumpSubroutine.Call();
+                            mvSyncDumpSubroutine.SetArg(0, branchDetailItem.BranchName);
+                            mvSyncDumpSubroutine.SetArg(1, file);
+                            mvSyncDumpSubroutine.SetArg(2, "0");
 
-                        dumpLog.Add(file, Convert.ToInt32(mvSyncDumpSubroutine.GetArg(2)));
+                            mvSyncDumpSubroutine.Call();
 
-                        tableNames.Add(file.Substring(3).Replace('.', '_'));
+                            dumpLog.Add(file, Convert.ToInt32(mvSyncDumpSubroutine.GetArg(2)));
 
-                        eventLog.AppendText("Dump Successful\n");
+                            tableNames.Add(file.Substring(3).Replace('.', '_'));
+                        });
+
+                        eventLog.AppendText($"Dump complete: {file}\n\n");
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
 
-                eventLog.AppendText($"{ex}\n");
+                eventLog.AppendText(exception.Message);
+
+                return false;
             }
 
             stopwatch.Stop();
 
-            return (int)stopwatch.ElapsedMilliseconds;
+            eventLog.AppendText("File dump complete.\n" +
+                                $"Time elapsed: {stopwatch.ElapsedMilliseconds}ms\n\n");
+
+            return true;
         }
 
-        //when this button is clicked, the files that have been dumped will be fetched from the linux box
-        private void fetchFilesButton_Click(object sender, EventArgs e)
+        //method to transfer the dumped uv files from linux to the sql box
+        private async Task<bool> FetchRemoteFiles()
         {
 
-            //we try and fetch the remote files from the linux box through the ssh protocol
-            try
-            {
+            Stopwatch stopwatch = new Stopwatch();
 
-                FetchRemoteFiles();
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        //button to perform the third and final portion of the refresh
-        private void bulkInsertButton_Click(object sender, EventArgs e)
-        {
+            stopwatch.Start();
 
             try
             {
 
+                //we need to clear out our destination directory
+                DirectoryInfo destinationDir = new DirectoryInfo(connectionDetails.DestinationPath);
+
+                foreach (var file in destinationDir.GetFiles())
+                {
+
+                    file.Delete();
+                }
+
+                //define our sftp connection with our remote linux box
+                using (var sftpClient = new SftpClient(connectionDetails.HostName, connectionDetails.SshPort, connectionDetails.Username, connectionDetails.Password))
+                {
+
+                    //establish the connection
+                    sftpClient.Connect();
+
+                    //we iterate through each one of the files in the dumpLog
+                    foreach (var item in dumpLog)
+                    {
+
+                        try
+                        {
+
+                            eventLog.AppendText($"Downloading file: {item}\n");
+
+                            await Task.Run(() => 
+                            {
+
+                                //check to see if the connection has been made and if so, we fetch the remote files that have been dumped
+                                using (Stream fileStream = File.Create($@"{connectionDetails.DestinationPath}{item.Key}.DAT"))
+                                {
+
+                                    //pulling the file from linux and popping it in the correct dest file
+                                    sftpClient.DownloadFile($"{connectionDetails.SourcePath}{item.Key}.DAT", fileStream);
+                                }
+                            });
+
+                            eventLog.AppendText($"File download complete: {item}\n\n");
+                        }
+                        catch (Exception)
+                        {
+
+                            //we just carry on if we can't transfer a particular file
+                            continue;
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+
+                eventLog.AppendText(exception.Message);
+
+                return false;
+            }
+
+            stopwatch.Stop();
+
+            eventLog.AppendText("File download complete.\n" +
+                    $"Time elapsed: {stopwatch.ElapsedMilliseconds}ms\n\n");
+
+            return true;
+        }
+
+        private async Task<bool> RunBulkInsert()
+        {
+
+            Stopwatch stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+
+            try
+            {
                 //invoking our entity model reference
                 using (Entities entities = new Entities())
                 {
@@ -207,22 +263,47 @@ namespace MVSyncRefreshManager
                     foreach (var table in tableNames)
                     {
 
-                        entities.Database.ExecuteSqlCommand($"truncate table [{table}]");
+                        eventLog.AppendText($"Truncating table: {table}\n");
+
+                        await Task.Run(() =>
+                        {
+
+                            entities.Database.ExecuteSqlCommand($"truncate table [{table}]");
+                        });
+
+                        eventLog.AppendText($"Table truncated: {table}\n\n");
                     }
 
                     //inserting the refresh data into the database
                     foreach (var item in dumpLog)
                     {
 
-                        entities.Database.ExecuteSqlCommand($"BulkInsert '{item.Key.Substring(3).Replace('.', '_')}', '{Resources.LocalTransferPath + item.Key}.DAT', '{item.Value}'");
+                        eventLog.AppendText($"Inserting into: {item.Key.Substring(3).Replace('.', '_')}\n");
+
+                        await Task.Run(() =>
+                        {
+
+                            entities.Database.ExecuteSqlCommand($"BulkInsert '{item.Key.Substring(3).Replace('.', '_')}', '{connectionDetails.DestinationPath + item.Key}.DAT', '{item.Value}'");
+                        });
+
+                        eventLog.AppendText($"Insert completed: {item.Key.Substring(3).Replace('.', '_')}\n\n");
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
 
-                throw;
+                eventLog.AppendText(exception.Message);
+
+                return false;
             }
+
+            stopwatch.Stop();
+
+            eventLog.AppendText("Bulk insert complete.\n" +
+                    $"Time elapsed: {stopwatch.ElapsedMilliseconds}ms\n\n");
+
+            return true;
         }
     }
 }

@@ -118,18 +118,9 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ConnectionConfigPath" xml:space="preserve">
-    <value>C:\Users\reece\Desktop\AutoZone Refresh Change\ConnectionConfig.json</value>
-  </data>
-  <data name="FileFetchConfigPath" xml:space="preserve">
-    <value>C:\Users\reece\Desktop\AutoZone Refresh Change\FileFetchConfig.json</value>
-  </data>
-  <data name="LocalTransferPath" xml:space="preserve">
-    <value>C:\RefreshTarget\</value>
+    <value>.\Config\ConnectionConfig.json</value>
   </data>
   <data name="RefreshConfigPath" xml:space="preserve">
-    <value>C:\Users\reece\Desktop\AutoZone Refresh Change\RefreshConfig.json</value>
-  </data>
-  <data name="RemoteDumpPath" xml:space="preserve">
-    <value>/u1/universe/MVSYNC/MVON.TRAN000/</value>
+    <value>.\Config\RefreshConfig.json</value>
   </data>
 </root>

@@ -1,0 +1,12 @@
+{
+    "BranchDetails" : [
+        {    
+            "BranchName" : "FDC",
+            "Files" : [
+              "FDC_IC.PSLIP",
+              "FDC_IC.PSDELLOG1",
+              "FDC_IC.PICKMF"
+            ]
+        }
+    ]
+}
