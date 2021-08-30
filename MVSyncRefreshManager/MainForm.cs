@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Renci.SshNet;
 using AutozoneSyncDataAccess;
 using System.Diagnostics;
+using Renci.SshNet.Common;
 
 namespace MVSyncRefreshManager
 {
@@ -107,10 +108,6 @@ namespace MVSyncRefreshManager
                 eventLog.AppendText(exception.Message);
             }
 
-            dumpButton.BackColor = Color.Green;
-            fetchFilesButton.BackColor = Color.Green;
-            bulkInsertButton.BackColor = Color.Green;
-
             eventLog.AppendText("Refresh completed successfully.");
         }
 
@@ -168,6 +165,8 @@ namespace MVSyncRefreshManager
             eventLog.AppendText("File dump complete.\n" +
                                 $"Time elapsed: {stopwatch.ElapsedMilliseconds}ms\n\n");
 
+            dumpButton.BackColor = Color.Green;
+
             return true;
         }
 
@@ -191,8 +190,15 @@ namespace MVSyncRefreshManager
                     file.Delete();
                 }
 
+                //we jook the system and make the remote host think someone just entered in a password manually
+                KeyboardInteractiveAuthenticationMethod keyboardInteractiveAuthenticationMethod = new KeyboardInteractiveAuthenticationMethod(connectionDetails.Username);
+
+                keyboardInteractiveAuthenticationMethod.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>(HandleKeyEvent);
+
+                ConnectionInfo connectionInfo = new ConnectionInfo(connectionDetails.HostName, connectionDetails.SshPort, connectionDetails.Username, keyboardInteractiveAuthenticationMethod);
+
                 //define our sftp connection with our remote linux box
-                using (var sftpClient = new SftpClient(connectionDetails.HostName, connectionDetails.SshPort, connectionDetails.Username, connectionDetails.Password))
+                using (var sftpClient = new SftpClient(connectionInfo))
                 {
 
                     //establish the connection
@@ -243,7 +249,21 @@ namespace MVSyncRefreshManager
             eventLog.AppendText("File download complete.\n" +
                     $"Time elapsed: {stopwatch.ElapsedMilliseconds}ms\n\n");
 
+            fetchFilesButton.BackColor = Color.Green;
+
             return true;
+        }
+
+        private void HandleKeyEvent(object sender, AuthenticationPromptEventArgs e)
+        {
+
+            foreach (AuthenticationPrompt prompt in e.Prompts)
+            {
+                if (prompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
+                {
+                    prompt.Response = connectionDetails.Password;
+                }
+            }
         }
 
         private async Task<bool> RunBulkInsert()
@@ -302,6 +322,8 @@ namespace MVSyncRefreshManager
 
             eventLog.AppendText("Bulk insert complete.\n" +
                     $"Time elapsed: {stopwatch.ElapsedMilliseconds}ms\n\n");
+
+            bulkInsertButton.BackColor = Color.Green;
 
             return true;
         }
