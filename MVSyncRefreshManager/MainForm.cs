@@ -279,6 +279,8 @@ namespace MVSyncRefreshManager
                 using (Entities entities = new Entities())
                 {
 
+                    entities.Database.CommandTimeout = 0;
+
                     //clearing the files before inserting the new data
                     foreach (var table in tableNames)
                     {
@@ -298,7 +300,7 @@ namespace MVSyncRefreshManager
                     foreach (var item in dumpLog)
                     {
 
-                        eventLog.AppendText($"Inserting into: {item.Key.Substring(3).Replace('.', '_')}\n");
+                        eventLog.AppendText($"Inserting : {item}\n");
 
                         await Task.Run(() =>
                         {
@@ -306,7 +308,7 @@ namespace MVSyncRefreshManager
                             entities.Database.ExecuteSqlCommand($"BulkInsert '{item.Key.Substring(3).Replace('.', '_')}', '{connectionDetails.DestinationPath + item.Key}.DAT', '{item.Value}'");
                         });
 
-                        eventLog.AppendText($"Insert completed: {item.Key.Substring(3).Replace('.', '_')}\n\n");
+                        eventLog.AppendText($"Insert completed: {item}\n\n");
                     }
                 }
             }

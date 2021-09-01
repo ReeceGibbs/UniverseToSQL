@@ -1,0 +1,69 @@
+SUBROUTINE MvSyncDump(Branch,FileName,RowCount)
+
+*-----
+
+* Syntax : NbBulkDump FileName
+
+* e.g.   : NbBulkDump ORDERS
+
+* A file MVON.TRANSFER needs to be created as a directory file pointing to the ftp server root/mvon
+
+*-----
+
+     TransferName = CHANGE(FileName,"/","_s_")
+
+     OPEN FileName TO File ELSE
+
+        CRT "Invalid File ":FileName
+
+        STOP
+
+     END
+
+     SELECT File
+
+     OPEN "MVON.TRANSFER" TO TranFile THEN
+
+        DELETE TranFile , FileName:".DAT"
+
+     END
+
+     OPENSEQ "MVON.TRANSFER",TransferName:".DAT" TO SeqFile ELSE NULL
+
+     RowCount = 0
+
+     LOOP
+
+        READNEXT Id ELSE EXIT
+
+        RowCount += 1
+
+        IF TRIM(Id) = "" THEN CONTINUE
+
+        IF TRIM(Id) # Id THEN CONTINUE
+
+        READ Rec FROM File , Id THEN
+
+           CONVERT "'" TO "''" IN Id
+
+           CONVERT "'" TO "''" IN Rec
+
+           CONVERT CHAR(10) TO "~" IN Id
+
+           CONVERT CHAR(10) TO "~" IN Rec
+
+           CONVERT CHAR(9) TO "~" IN Rec
+
+           CONVERT CHAR(9) TO "~" IN Id
+
+           Line = Branch:":":Id:CHAR(9):Rec
+
+           WRITESEQ Line ON SeqFile ELSE NULL
+
+        END
+
+     REPEAT
+
+     CLOSESEQ SeqFile
+
+     END
