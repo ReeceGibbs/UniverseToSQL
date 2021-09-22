@@ -5,6 +5,18 @@
       "Files": [
         "FDC_IC.PSLIP"
       ]
+    },
+    {
+      "BranchName": "CDC",
+      "Files": [
+        "CDC_IC.PSLIP"
+      ]
+    },
+    {
+      "BranchName": "FBL",
+      "Files": [
+        "FBL_IC.PSLIP"
+      ]
     }
   ]
 }
